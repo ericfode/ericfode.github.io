@@ -40,8 +40,8 @@
 					// a successful payment.
 					// Instead use one of the strategies described in
 					// https://stripe.com/docs/payments/checkout/fulfillment
-					successUrl: window.location.protocol + '//twitter.com/_siddev/success',
-					cancelUrl: window.location.protocol + '//twitter.com/_siddev/canceled',
+					successUrl: window.location.protocol + '/success',
+					cancelUrl: window.location.protocol + '/canceled',
 				})
 					.then(function (result) {
 						if (result.error) {
