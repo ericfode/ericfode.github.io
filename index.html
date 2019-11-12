@@ -33,7 +33,7 @@
 				// them to Checkout.
 				stripe.redirectToCheckout({
 					items: [{ sku: 'sku_GAObkfmqSNKUz9', quantity: 1 }],
-					billingAddressCollection: true,
+					billingAddressCollection: 'required',
 
 					// Do not rely on the redirect to the successUrl for fulfilling
 					// purchases, customers may not always reach the success_url after
