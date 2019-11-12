@@ -13,134 +13,47 @@
   </head>
 
   <body>
-    <div class="sr-root">
-      <div class="sr-main">
-        <header class="sr-header">
-          <div class="sr-header__logo"></div>
-        </header>
-        <section class="container">
-          <div>
-            <h1>Single photo</h1>
-            <h4>Purchase a Pasha original photo</h4>
-            <div class="pasha-image">
-              <img
-                src="https://picsum.photos/280/320?random=4"
-                width="140"
-                height="160"
-              />
-            </div>
-          </div>
-          <div class="quantity-setter">
-            <button class="increment-btn" id="subtract" disabled>
-              -
-            </button>
-            <input type="number" id="quantity-input" min="1" value="1" />
-            <button class="increment-btn" id="add">+</button>
-          </div>
-          <p class="sr-legal-text">Number of copies (max 10)</p>
 
-          <button id="basic-photo-button">
-            Buy for $<span id="total">5</span>.00
-          </button>
-        </section>
-        <div id="error-message"></div>
-      </div>
-    </div>
+	  <!-- Create a button that your customers click to complete their purchase. Customize the styling to suit your branding. -->
+	  <button
+		  style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
+		  id="checkout-button-sku_GAObkfmqSNKUz9"
+		  role="link"
+		  >
+		  Checkout
+	  </button>
 
-    <script>
-      // Replace with your own publishable key: https://dashboard.stripe.com/test/apikeys
-      var PUBLISHABLE_KEY = "pk_1234";
-      // Replace with the domain you want your users to be redirected back to after payment
-      var DOMAIN = window.location.hostname;
-      // Replace with a SKU for your own product (created either in the Stripe Dashboard or with the API)
-      var SKU_ID = "sku_1234";
+		  <div id="error-message"></div>
 
-      if (PUBLISHABLE_KEY === "pk_1234") {
-        console.log(
-          "Replace the hardcoded publishable key with your own publishable key: https://dashboard.stripe.com/test/apikeys"
-        );
-      }
+		  <script>
+			  (function() {
+				  var stripe = Stripe('pk_live_RbI83IxTfudVlBdmgOcHV8FT');
 
-      if (SKU_ID === "sku_1234") {
-        console.log(
-          "Replace the hardcoded SKU ID with your own SKU: https://stripe.com/docs/api/skus"
-        );
-      }
+				  var checkoutButton = document.getElementById('checkout-button-sku_GAObkfmqSNKUz9');
+				  checkoutButton.addEventListener('click', function () {
+					  // When the customer clicks on the button, redirect
+					  // them to Checkout.
+					  stripe.redirectToCheckout({
+						  items: [{sku: 'sku_GAObkfmqSNKUz9', quantity: 1}],
 
-      var MIN_PHOTOS = 1;
-      var MAX_PHOTOS = 10;
-
-      var stripe = Stripe(PUBLISHABLE_KEY);
-
-      var basicPhotoButton = document.getElementById("basic-photo-button");
-      document
-        .getElementById("quantity-input")
-        .addEventListener("change", function(evt) {
-          // Ensure customers only buy between 1 and 10 photos
-          if (evt.target.value < MIN_PHOTOS) {
-            evt.target.value = MIN_PHOTOS;
-          }
-          if (evt.target.value > MAX_PHOTOS) {
-            evt.target.value = MAX_PHOTOS;
-          }
-        });
-
-      var updateQuantity = function(evt) {
-        if (evt && evt.type === "keypress" && evt.keyCode !== 13) {
-          return;
-        }
-
-        var isAdding = evt.target.id === "add";
-        var inputEl = document.getElementById("quantity-input");
-        var currentQuantity = parseInt(inputEl.value);
-
-        document.getElementById("add").disabled = false;
-        document.getElementById("subtract").disabled = false;
-
-        var quantity = isAdding ? currentQuantity + 1 : currentQuantity - 1;
-
-        inputEl.value = quantity;
-        document.getElementById("total").textContent = quantity * 5;
-
-        // Disable the button if the customers hits the max or min
-        if (quantity === MIN_PHOTOS) {
-          document.getElementById("subtract").disabled = true;
-        }
-        if (quantity === MAX_PHOTOS) {
-          document.getElementById("add").disabled = true;
-        }
-      };
-
-      Array.from(document.getElementsByClassName("increment-btn")).forEach(
-        element => {
-          element.addEventListener("click", updateQuantity);
-        }
-      );
-
-      // Handle any errors from Checkout
-      var handleResult = function(result) {
-        if (result.error) {
-          var displayError = document.getElementById("error-message");
-          displayError.textContent = result.error.message;
-        }
-      };
-
-      basicPhotoButton.addEventListener("click", function() {
-        var quantity = parseInt(
-          document.getElementById("quantity-input").value
-        );
-
-        // Make the call to Stripe.js to redirect to the checkout page
-        // with the current quantity
-        stripe
-          .redirectToCheckout({
-            items: [{ sku: SKU_ID, quantity: quantity }],
-            successUrl:
-              DOMAIN + "/success.html?session_id={CHECKOUT_SESSION_ID}",
-            cancelUrl: DOMAIN + "/canceled.html"
-          })
-          .then(handleResult);
-      });
-    </script>
+						  // Do not rely on the redirect to the successUrl for fulfilling
+						  // purchases, customers may not always reach the success_url after
+						  // a successful payment.
+						  // Instead use one of the strategies described in
+						  // https://stripe.com/docs/payments/checkout/fulfillment
+						  successUrl: window.location.protocol + '//twitter.com/_siddev/success',
+						  cancelUrl: window.location.protocol + '//twitter.com/_siddev/canceled',
+					  })
+						  .then(function (result) {
+							  if (result.error) {
+								  // If `redirectToCheckout` fails due to a browser or network
+								  // error, display the localized error message to your customer.
+								  var displayError = document.getElementById('error-message');
+								  displayError.textContent = result.error.message;
+							  }
+						  });
+				  });
+			  })();
+		  </script>
   </body>
 </html>
